@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+/* 🚨 REFUERZO NOIR ABSOLUTO - CSS NATIVO (PARA EVITAR ERRORES DE COMPILACIÓN) */
+html,
+body {
+  margin: 0 !important;
+  height: 100vh !important;
+  width: 100vw !important;
+  background-color: #05010a !important; /* Force black directly */
+  color: #ffffff !important;
+  font-family: var(--font-display, sans-serif);
+  overflow: hidden !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* UTILIDADES TAILWIND v4 - CORREGIDAS */
+@utility premium-card {
+  background: rgba(10, 10, 10, 0.7); /* Solid base to separate from BG gradient */
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 60px rgba(0, 0, 0, 0.8);
+  border-radius: 1.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto hover suavizado (Sin Brillo Cian) */
+.premium-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+}
+
+@utility liquid-glass {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+@media print {
+  html, body {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+    width: auto !important;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}

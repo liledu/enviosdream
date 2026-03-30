@@ -1,0 +1,99 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getSessionUserFromCookies } from '../lib/auth';
+
+const user = await getSessionUserFromCookies(Astro.cookies);
+
+if (!user) {
+    return Astro.redirect('/');
+}
+---
+
+<Layout title="Historial de Movimientos">
+    <main class="flex-1 flex flex-col p-4 md:p-8 max-w-5xl mx-auto w-full overflow-hidden">
+        <header class="mb-8 relative">
+            <div class="flex flex-col gap-1">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500">Historial Maestro</p>
+                <h1 class="text-4xl font-black tracking-tight text-white mt-2">Log de Actividad</h1>
+                <div class="h-1 w-16 bg-white/10 mt-4"></div>
+            </div>
+        </header>
+
+        <section class="premium-card flex flex-col min-h-0 flex-1 overflow-hidden">
+            <div class="p-6 border-b border-white/5 bg-white/[0.02]">
+                <label for="searchLog" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Filtro de Auditoría</label>
+                <input 
+                    type="text" 
+                    id="searchLog" 
+                    placeholder="Filtrar por nombre, fecha o mensaje..." 
+                    class="w-full rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white outline-none focus:border-white/30 transition-all focus:bg-white/10 placeholder:text-slate-700 font-medium" 
+                />
+            </div>
+            
+            <div id="fullLogList" class="flex-1 overflow-y-auto divide-y divide-white/5 custom-scrollbar bg-black/20">
+                <div class="flex items-center justify-center h-64 text-slate-500 italic text-sm animate-pulse tracking-widest uppercase font-black">
+                    Sincronizando con Cloud Vault...
+                </div>
+            </div>
+        </section>
+
+        <footer class="mt-8 text-center text-slate-700 text-[9px] font-black uppercase tracking-[0.5em]">
+            Audit Trail Secured & Encrypted
+        </footer>
+    </main>
+
+    <script>
+        let logs: any[] = [];
+        const fullLogList = document.getElementById('fullLogList');
+        const searchInput = document.getElementById('searchLog') as HTMLInputElement;
+
+        async function fetchAllLogs() {
+            try {
+                const response = await fetch('/api/logs?all=true'); 
+                const data = await response.json();
+                logs = data.logs || [];
+                renderLogs(logs);
+            } catch (err) {
+                fullLogList!.innerHTML = '<div class="p-12 text-center text-rose-500/50 italic text-xs font-bold tracking-widest uppercase py-20">Error de conexión con la bóveda de datos.</div>';
+            }
+        }
+
+        function renderLogs(items: any[]) {
+            if (items.length === 0) {
+                fullLogList!.innerHTML = '<div class="p-12 text-center text-slate-600 italic text-xs font-bold tracking-widest uppercase py-20">No se encontraron registros de seguridad.</div>';
+                return;
+            }
+
+            fullLogList!.innerHTML = items.map(log => {
+                const date = new Date(log.fecha || log.created_at);
+                const dateStr = date.toLocaleDateString('es-HN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = date.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' });
+
+                return `
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-7 hover:bg-white/[0.03] transition-all group">
+                        <div class="flex items-center gap-5">
+                            <div class="h-2 w-2 rounded-full bg-white/20 group-hover:bg-white group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all"></div>
+                            <span class="text-sm font-bold text-slate-300 group-hover:text-white transition-colors tracking-tight leading-relaxed">${log.mensaje}</span>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0 ml-7 md:ml-0">
+                            <span class="text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl bg-white/5 text-slate-500 border border-white/5">
+                                ${dateStr}
+                            </span>
+                            <span class="text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl bg-white/5 text-white/40 border border-white/10 group-hover:bg-white group-hover:text-black transition-all">
+                                ${timeStr}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.toLowerCase().trim();
+            const filtered = logs.filter(log => log.mensaje.toLowerCase().includes(query));
+            renderLogs(filtered);
+        });
+
+        fetchAllLogs();
+    </script>
+</Layout>

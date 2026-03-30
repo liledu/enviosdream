@@ -1,0 +1,193 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+export const prerender = false;
+---
+
+<Layout title="Gestión de Clientes">
+    <main class="flex-1 flex flex-col p-4 md:p-8 h-full max-w-7xl mx-auto w-full overflow-hidden">
+        <header class="mb-6 flex items-center justify-between">
+            <div class="flex flex-col">
+                <p class="text-[9px] font-black uppercase tracking-[0.4em] text-slate-500">Directorio de Operaciones</p>
+                <h1 class="text-3xl font-black tracking-tight text-white mt-1">Gestión de Clientes</h1>
+            </div>
+            <!-- Logo without invert -->
+            <img src="/logo.png" class="h-10 w-auto object-contain opacity-90" alt="Logo" />
+        </header>
+
+        <div class="grid gap-6 lg:grid-cols-[380px_1fr] flex-1 min-h-0">
+            <!-- Sidebar: Client List - Viewport Fit Scroll -->
+            <section class="premium-card flex flex-col min-h-0">
+                <div class="p-6 pb-4 border-b border-white/5">
+                    <label for="searchClient" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 font-bold">Filtro Rápido</label>
+                    <input 
+                        id="searchClient" 
+                        type="text" 
+                        placeholder="Nombre o código..." 
+                        class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-white/30 focus:bg-white/10 placeholder:text-slate-600" 
+                    />
+                </div>
+                
+                <div id="clientList" class="flex-1 overflow-y-auto px-4 py-4 space-y-2 custom-scrollbar bg-black/20">
+                    <div class="flex items-center justify-center p-12 text-slate-500 animate-pulse text-xs font-bold uppercase tracking-widest italic">Sincronizando...</div>
+                </div>
+            </section>
+
+            <!-- Main: Client Form -->
+            <section class="premium-card p-8 lg:p-10 relative overflow-hidden flex flex-col justify-center">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-purple-500/5 blur-[100px] pointer-events-none"></div>
+
+                <div class="mb-8 border-b border-white/5 pb-6">
+                    <h2 class="text-xl font-black tracking-tight text-white uppercase tracking-wider">Expediente Digital</h2>
+                    <p class="mt-1 text-slate-500 text-[10px] font-bold uppercase tracking-widest italic">Auth Secured by Supabase</p>
+                </div>
+
+                <form id="clientForm" novalidate class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5 relative z-10">
+                    <div class="md:col-span-1">
+                        <label for="clientCode" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-white/40">ID Registro</label>
+                        <input id="clientCode" type="text" placeholder="Auto" readonly class="w-full rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-white/30 outline-none font-mono text-[10px]" />
+                    </div>
+
+                    <div class="md:col-span-1">
+                        <label for="clientPhone" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Teléfono</label>
+                        <input id="clientPhone" type="text" placeholder="+504" class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-white/30" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="clientName" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Nombre Social</label>
+                        <input id="clientName" type="text" placeholder="..." class="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-white/30" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label for="clientAddress" class="mb-2 block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Dirección Logística</label>
+                        <textarea id="clientAddress" placeholder="..." class="min-h-[140px] w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-white/30 resize-none"></textarea>
+                    </div>
+
+                    <div class="md:col-span-2 flex items-center gap-4 pt-6 mt-2 border-t border-white/5">
+                        <button type="submit" id="saveBtn" class="flex-1 sm:flex-none px-10 py-4 rounded-2xl bg-white text-black text-[10px] font-black uppercase tracking-widest transition hover:bg-slate-200 active:scale-95 shadow-xl shadow-white/5 flex items-center justify-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                            Guardar
+                        </button>
+                        <button type="button" id="newBtn" class="flex-1 sm:flex-none px-10 py-4 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest transition hover:bg-white/10 active:scale-95 flex items-center justify-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            Nuevo
+                        </button>
+                    </div>
+                    
+                    <div id="statusText" class="md:col-span-2 text-[9px] font-black uppercase tracking-widest py-2 text-center opacity-0 transition-opacity"></div>
+                </form>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        const clientList = document.getElementById('clientList') as HTMLDivElement;
+        const clientForm = document.getElementById('clientForm') as HTMLFormElement;
+        const clientCode = document.getElementById('clientCode') as HTMLInputElement;
+        const clientName = document.getElementById('clientName') as HTMLInputElement;
+        const clientPhone = document.getElementById('clientPhone') as HTMLInputElement;
+        const clientAddress = document.getElementById('clientAddress') as HTMLTextAreaElement;
+        const statusText = document.getElementById('statusText') as HTMLDivElement;
+        const newBtn = document.getElementById('newBtn') as HTMLButtonElement;
+        const searchInput = document.getElementById('searchClient') as HTMLInputElement;
+
+        let clientsDatabase: any[] = [];
+        let selectedId: number | null = null;
+
+        async function init() {
+            await fetchClientes();
+            searchInput.oninput = () => renderList(searchInput.value);
+        }
+
+        async function fetchClientes() {
+            const resp = await fetch('/api/clientes');
+            const data = await resp.json();
+            clientsDatabase = data.clients || [];
+            renderList();
+        }
+
+        function renderList(filter = '') {
+            const normalized = filter.trim().toLowerCase();
+            const filtered = clientsDatabase.filter(c => 
+                (c.nombre || '').toLowerCase().includes(normalized) || 
+                (c.codigo || '').toLowerCase().includes(normalized)
+            );
+
+            clientList.innerHTML = filtered.map(c => `
+                <button type="button" class="w-full relative group rounded-2xl border p-5 text-left transition-all duration-300 ${c.id === selectedId ? 'border-white/40 bg-white/10 shadow-lg shadow-white/5' : 'border-white/5 bg-white/[0.02] hover:bg-white/[0.06] hover:border-white/10'}" data-id="${c.id}">
+                    <div class="flex items-center justify-between">
+                        <strong class="block text-sm font-bold truncate ${c.id === selectedId ? 'text-white' : 'text-slate-400'}">${c.nombre}</strong>
+                        ${c.id === selectedId ? '<div class="h-1.5 w-1.5 rounded-full bg-white animate-pulse"></div>' : ''}
+                    </div>
+                    <div class="mt-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">
+                        <span>${c.codigo || 'S/C'}</span>
+                        <span class="mx-2 opacity-20">|</span>
+                        <span>${c.celular || 'S/N'}</span>
+                    </div>
+                </button>
+            `).join('') || '<div class="text-center py-20 text-slate-600 text-[10px] font-bold uppercase tracking-[0.4em] italic">Directorio Vacío</div>';
+
+            clientList.querySelectorAll('[data-id]').forEach(btn => {
+                btn.onclick = () => loadClient((btn as HTMLElement).dataset.id);
+            });
+        }
+
+        function loadClient(id: string | undefined) {
+            if (!id) return;
+            const c = clientsDatabase.find(i => String(i.id) === id);
+            if (!c) return;
+            selectedId = c.id;
+            clientCode.value = c.codigo || c.code || '';
+            clientName.value = c.nombre || c.name || '';
+            clientPhone.value = c.celular || c.phone || '';
+            clientAddress.value = c.direccion || c.address || '';
+            
+            statusText.textContent = 'Expediente Cargado';
+            statusText.className = 'md:col-span-2 text-[9px] font-black uppercase tracking-widest py-2 text-center text-white opacity-100';
+            renderList(searchInput.value);
+        }
+
+        newBtn.onclick = () => {
+            selectedId = null;
+            clientForm.reset();
+            clientCode.value = '';
+            statusText.textContent = 'Nuevo Registro';
+            statusText.className = 'md:col-span-2 text-[9px] font-black uppercase tracking-widest py-2 text-center text-slate-500 opacity-100';
+            renderList(searchInput.value);
+            clientName.focus();
+        };
+
+        clientForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!clientName.value.trim()) return;
+
+            statusText.textContent = 'Sincronizando...';
+            statusText.classList.remove('opacity-0');
+            statusText.classList.add('animate-pulse');
+
+            try {
+                const resp = await fetch('/api/clientes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: selectedId,
+                        nombre: clientName.value.trim(),
+                        celular: clientPhone.value.trim(),
+                        direccion: clientAddress.value.trim()
+                    })
+                });
+
+                if (resp.ok) {
+                    statusText.textContent = '✓ Guardado con éxito';
+                    statusText.className = 'md:col-span-2 text-[9px] font-black uppercase tracking-widest py-2 text-center text-emerald-500 opacity-100';
+                    await fetchClientes();
+                }
+            } catch (err) {
+                statusText.textContent = '✕ Error de Guardado';
+                statusText.className = 'md:col-span-2 text-[9px] font-black uppercase tracking-widest py-2 text-center text-rose-500 opacity-100';
+            }
+        };
+
+        init();
+    </script>
+</Layout>

@@ -1,0 +1,100 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+export const prerender = false;
+---
+
+<Layout title="Acceso | Machote">
+	<main class="relative flex h-screen items-center justify-center overflow-hidden px-4">
+		<!-- Main Login Card -->
+		<section class="relative z-10 w-full max-w-sm rounded-[2.5rem] border border-white/10 bg-white/[0.03] p-10 shadow-2xl backdrop-blur-3xl liquid-glass">
+			<div class="mb-12 text-center">
+				<!-- Original Logo (No Invert) -->
+				<img src="/logo.png" alt="Logo" class="mx-auto mb-6 h-20 w-auto object-contain transition-transform hover:scale-105 duration-700" />
+				
+				<p class="mb-2 text-[9px] font-black uppercase tracking-[0.5em] text-white/50">Plataforma Segura</p>
+				<h1 class="text-4xl font-black tracking-tight text-white mb-2">MACHOTE</h1>
+				<p class="text-slate-500 text-[10px] font-medium uppercase tracking-widest italic opacity-60">Logística de Identidad Digital</p>
+			</div>
+
+			<form id="loginForm" novalidate class="space-y-6">
+				<div class="space-y-2">
+					<label for="username" class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 ml-2">Usuario</label>
+					<input
+						id="username"
+						name="username"
+						type="text"
+						placeholder="ID de Operador"
+						autocomplete="username"
+						class="w-full rounded-2xl border border-white/5 bg-white/5 px-5 py-4 text-sm text-white outline-none transition-all focus:border-white/30 focus:bg-white/10 placeholder:text-slate-700 font-medium"
+					/>
+				</div>
+
+				<div class="space-y-2">
+					<label for="password" class="block text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 ml-2">Contraseña</label>
+					<input
+						id="password"
+						name="password"
+						type="password"
+						placeholder="••••••••"
+						autocomplete="current-password"
+						class="w-full rounded-2xl border border-white/5 bg-white/5 px-5 py-4 text-sm text-white outline-none transition-all focus:border-white/30 focus:bg-white/10 placeholder:text-slate-700 font-medium"
+					/>
+				</div>
+
+				<div id="status" class="min-h-6 text-center text-[10px] font-black uppercase tracking-widest transition-opacity opacity-0" aria-live="polite"></div>
+
+				<button
+					type="submit"
+					class="w-full rounded-2xl bg-white px-4 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-black transition hover:bg-slate-200 active:scale-95 shadow-xl shadow-white/5"
+				>
+					Iniciar Sesión
+				</button>
+			</form>
+		</section>
+
+		<!-- Decorative bottom label -->
+		<div class="absolute bottom-10 text-[8px] font-black uppercase tracking-[0.5em] text-slate-700">
+			Encrypted Connection Verified
+		</div>
+	</main>
+
+	<script>
+		const loginForm = document.getElementById('loginForm') as HTMLFormElement;
+		const status = document.getElementById('status') as HTMLDivElement;
+
+		loginForm.addEventListener('submit', async (event) => {
+			event.preventDefault();
+
+			const usernameInput = (document.getElementById('username') as HTMLInputElement).value.trim();
+			const password = (document.getElementById('password') as HTMLInputElement).value;
+
+			status.textContent = 'Verificando...';
+			status.className = 'min-h-6 text-center text-[10px] font-black uppercase tracking-widest text-slate-400 opacity-100 animate-pulse';
+
+			const response = await fetch('/api/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					username: usernameInput,
+					password,
+				}),
+			});
+
+			const result = await response.json().catch(() => ({}));
+
+			if (!response.ok) {
+				status.textContent = result.message || 'Denegado: Credenciales no válidas';
+				status.className = 'min-h-6 text-center text-[10px] font-black uppercase tracking-widest text-rose-500 opacity-100';
+				return;
+			}
+
+			status.textContent = 'Acceso Concedido';
+			status.className = 'min-h-6 text-center text-[10px] font-black uppercase tracking-widest text-emerald-400 opacity-100';
+
+			setTimeout(() => {
+				window.location.href = '/machote';
+			}, 500);
+		});
+	</script>
+</Layout>

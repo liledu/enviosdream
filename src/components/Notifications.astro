@@ -1,0 +1,95 @@
+---
+/**
+ * Notifications.astro
+ * Sistema de notificaciones ultra-ligero (estilo Sonner Blur Overlay)
+ */
+---
+
+<div id="notification-container" class="fixed bottom-32 left-1/2 -translate-x-1/2 z-[10000] flex flex-col items-center gap-4 pointer-events-none w-full max-w-md px-4">
+    <!-- Toasts will be injected here via JS -->
+</div>
+
+<style is:global>
+    @keyframes toast-in {
+        from { transform: translateY(2rem) scale(0.9); opacity: 0; filter: blur(10px); }
+        to { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+    }
+
+    @keyframes toast-out {
+        from { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); }
+        to { transform: translateY(-1rem) scale(0.95); opacity: 0; filter: blur(10px); }
+    }
+
+    .toast-animate-in {
+        animation: toast-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .toast-animate-out {
+        animation: toast-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+</style>
+
+<script>
+    interface ToastOptions {
+        message: string;
+        type?: 'success' | 'error' | 'info';
+        duration?: number;
+    }
+
+    const typeColors = {
+        success: 'bg-emerald-500/30',
+        error: 'bg-rose-500/30',
+        info: 'bg-white/20',
+    };
+
+    const typeIcons = {
+        success: '✨',
+        error: '🚨',
+        info: '🔔',
+    };
+
+    window.showToast = ({ message, type = 'info', duration = 3000 }: ToastOptions) => {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'flex items-center justify-center w-full pointer-events-none relative toast-animate-in mb-4 min-w-[320px]';
+
+        // Blur Overlay (Dynamic Glow)
+        const overlay = document.createElement('div');
+        overlay.className = `absolute inset-[-20px] ${typeColors[type]} rounded-full blur-[40px] opacity-60`;
+        
+        // Main Capsule
+        const capsule = document.createElement('div');
+        capsule.className = 'flex items-center gap-4 backdrop-blur-2xl bg-black/60 px-8 py-4 rounded-full border border-white/15 shadow-[0_20px_50px_rgba(0,0,0,0.5)] text-white font-bold text-sm relative z-10';
+        
+        const icon = document.createElement('span');
+        icon.className = 'text-xl';
+        icon.textContent = typeIcons[type];
+
+        const text = document.createElement('span');
+        text.className = 'tracking-tight uppercase text-[10px] tracking-[0.1em]';
+        text.textContent = message;
+
+        capsule.appendChild(icon);
+        capsule.appendChild(text);
+        toast.appendChild(overlay);
+        toast.appendChild(capsule);
+        container.appendChild(toast);
+
+        // Remove toast after duration
+        setTimeout(() => {
+            toast.classList.replace('toast-animate-in', 'toast-animate-out');
+            setTimeout(() => {
+                toast.remove();
+            }, 500);
+        }, duration);
+    };
+
+    // Global TypeScript Declaration
+    declare global {
+        interface Window {
+            showToast: (options: ToastOptions) => void;
+        }
+    }
+</script>

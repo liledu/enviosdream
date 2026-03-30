@@ -1,0 +1,8 @@
+node_modules/
+.env*
+dist/
+.astro/
+.DS_Store
+.github/
+legacy/
+supabase-setup.sql
